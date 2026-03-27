@@ -75,8 +75,37 @@ def viewdb():
 
 
 # TODO: Section 2 — add your /artistquery/<artist_id> route here
-
+@app.route("/artistquery/<artist_id>")
+def artistquery(artist_id):
+    rows = execute_query(
+         """
+        SELECT ArtistId, Artist.Name, Track.Name, UnitPrice
+        FROM Artist
+        JOIN Album USING (ArtistID)
+        JOIN Track USING (AlbumID)
+        WHERE ArtistId = %s
+        """,
+        (artist_id)
+    )
+    return display_html(rows)
 # TODO: Section 3 — add your /pricequerytextbox GET and POST routes here
+@app.route("/pricequerytextbox", methods=['GET'])
+def price_form():
+    """
+    GET handler: renders the empty search form.
+    The 'fieldname' variable fills in the label text in textbox.html.
+    """
+    return render_template('textbox.html', fieldname="Price")
+
+@app.route("/pricequerytextbox", methods=['POST'])
+def price_form_post():
+    """
+    POST handler: reads the value the user typed into the form,
+    then calls viewprices() to run the query and return the table.
+    """
+    text = request.form['text']
+    return viewprices(text)
+
 
 # TODO: Section 3 — add your /timequerytextbox GET and POST routes here
 
