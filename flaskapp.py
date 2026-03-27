@@ -88,6 +88,24 @@ def artistquery(artist_id):
         (artist_id)
     )
     return display_html(rows)
+@app.route("/pricequery/<price>")
+def viewprices(price):
+    """
+    Returns all tracks where UnitPrice matches the given price.
+    Can be called from the URL directly (/pricequery/1.99)
+    or from the POST form handler above.
+    """
+    rows = execute_query("""
+        SELECT ArtistId, Artist.Name, Track.Name, UnitPrice, Milliseconds
+        FROM Artist
+        JOIN Album USING (ArtistID)
+        JOIN Track USING (AlbumID)
+        WHERE UnitPrice = %s
+        ORDER BY Track.Name
+        LIMIT 500
+    """, (str(price),))
+    return display_html(rows)
+
 # TODO: Section 3 — add your /pricequerytextbox GET and POST routes here
 @app.route("/pricequerytextbox", methods=['GET'])
 def price_form():
@@ -108,6 +126,34 @@ def price_form_post():
 
 
 # TODO: Section 3 — add your /timequerytextbox GET and POST routes here
+@app.route("/timequerytextbox", methods=['GET'])
+def time_form():
+    rows = execute_query ("""
+                           SELECT ArtistId, Artist.Name, Track.Name, UnitPrice, Milliseconds
+        FROM Artist
+        JOIN Album USING (ArtistID)
+        JOIN Track USING (AlbumID)
+        WHERE Milliseconds > %s
+        ORDER BY Milliseconds DESC
+        LIMIT 500
+    """, (str(time_form),))
+    return display_html(rows)
+                          
+
+@app.route("/timequerytextbox", methods=['POST'])
+def time_form_post():
+    def time_form():
+         """Displays a form for the user to enter a milliseconds threshold."""
+    return """
+        <h2>Track Duration Query</h2>
+        <form method="POST">
+            <label>Show tracks longer than (milliseconds):</label><br><br>
+            <input type="number" name="time" placeholder="e.g. 2950000" required>
+            <input type="submit" value="Search">
+        </form>
+    """
+        
+    
 
 
 # ---------------------------------------------------------------------------
